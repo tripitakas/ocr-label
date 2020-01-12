@@ -17,6 +17,11 @@ import re
 
 BASE_DIR = path.dirname(path.dirname(__file__))
 
+with open(path.join(path.dirname(__file__), 'char_label.txt')) as fl:
+    _chars = fl.readlines()
+indice2char = {t.split(' ')[0]: t.strip().split(' ')[1] for t in _chars}
+char2indice = {t.strip().split(' ')[1]: t.split(' ')[0] for t in _chars}
+
 
 def load_config():
     param = dict(encoding='utf-8') if PY3 else {}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{site['name']}}</title>
+  <link rel="shortcut icon" href="{{ static_url('imgs/favicon.ico') }}" type="image/x-icon">
+</head>
+
+<body>
+
+<h3>{{site['description']}}</h3>
+<p>版本：{{version}}</p>
+<p>
+  <a href="/api/user/login?next={{full_url}}">
+    {% if currentUserId %}{{current_user['name']}}{% else %}登录{% end %}
+  </a> |
+  <a href="/char">单字校对</a>
+</p>
+</body>
+</html>

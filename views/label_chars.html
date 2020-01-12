@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% include _base_meta.html %}
+  {% include _base_css.html %}
+  <title>单字校对</title>
+  <style>
+    .grid-item {
+      margin: 2px;
+      border: 2px solid transparent;
+      text-align: center;
+    }
+    .grid-item:hover {
+      border: 2px solid #ddd;
+      color: #00f;
+      font-weight: 700;
+    }
+    .grid-item:hover > img {
+      cursor: pointer;
+    }
+
+    .panel-heading {
+      margin-right: 0;
+    }
+    .breadcrumb {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+
+<body>
+<div class="app-main">
+  <div class="main">
+
+    <div class="panel panel-default">
+      <div class="panel-heading row">
+        <div class="col-sm-9">
+          <ol class="breadcrumb">
+            <li><a href="/">{{site['name']}}</a></li>
+            <li class="active">单字校对</li>
+          </ol>
+        </div>
+
+        <div class="col-sm-3">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="输入单字" id="search-box">
+            <span class="input-group-btn">
+              <button class="btn btn-default waves-effect" type="button" id="search">进入</button>
+              <a href="/api/user/login?next={{full_url}}" class="btn btn-default waves-effect" title="登录到大藏经数字化平台">
+                {% if currentUserId %}{{current_user['name']}}{% else %}登录{% end %}
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="grid">
+          {% for i, c in enumerate(chars) %}
+          <div class="grid-item" data-char="{{c['txt']}}">
+            <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{static_url('chars/%s/%s%03d.jpg' % (c['char']['page'], c['txt'], c['char']['cid']))}}">
+            <p title="{{i + 1}}. {{c['txt']}} {{c['count']}}个样本">{{c['txt']}} {{c['count']}}</p>
+          </div>
+          {% end %}
+        </div>
+      </div>
+
+    </div>
+    {% module Pager(pager) %}
+
+  </div>
+</div>
+
+{% include _base_js.html %}
+<script src="{{ static_url('assets/gallery/isotope.js') }}"></script>
+
+<script>
+  $('.grid').isotope({
+    layoutMode: 'fitRows',
+    itemSelector: '.grid-item',
+    percentPosition: true
+  });
+
+  $('#search').click(function() {
+    var txt = $('#search-box').val();
+    if (txt[0]) {
+      window.location = '/char/' + txt[0];
+    } else {
+      showError('请输入单字');
+    }
+  });
+  $('#search-box').keydown(function(e) {
+    if (e.keyCode === 13) {
+      $('#search').click();
+    }
+  });
+
+  $('.grid-item > img').click(function() {
+    window.location = '/char/' + $(this).parent().attr('data-char');
+  });
+</script>
+</body>
+</html>

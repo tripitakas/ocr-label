@@ -10,7 +10,7 @@ class HomeHandler(BaseHandler):
 
     def get(self):
         """ 首页 """
-        self.redirect('/api')
+        self.render('home.html', version=self.application.version)
 
 
 class LoginHandler(BaseHandler):

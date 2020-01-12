@@ -52,12 +52,15 @@ def not_empty(**kw):
 
 def not_both_empty(**kw):
     """不允许同时为空以及空串"""
-    assert len(kw) == 2
-    k1, k2 = kw.keys()
-    v1, v2 = kw.values()
+    assert len(kw) >= 2
     code, message = e.not_allowed_both_empty
-    err = code, message % (i18n_trans(k1), i18n_trans(k2))
-    if not v1 and not v2:
+    if len(kw) == 3:
+        k1, k2, k3 = kw.keys()
+        err = code, message % (i18n_trans(k1) + '、' + i18n_trans(k2), i18n_trans(k3))
+    else:
+        k1, k2 = kw.keys()
+        err = code, message % (i18n_trans(k1), i18n_trans(k2))
+    if not (any(kw.values())):
         return {k1: err, k2: err}
 
 

@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from controller.com import invalid
-from controller import com
+from controller import com, label
 
-views = com.views
+views = com.views + label.views
 
-handlers = com.handlers
+handlers = com.handlers + label.handlers
 handlers += [invalid.ApiTable]
 
 modules = com.modules

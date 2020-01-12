@@ -30,11 +30,11 @@ python -m pip install -r requirements.txt
 
 ### 4. 启动网站服务
 
-运行 `python seed_main.py`，或者在 PyCharm 等集成开发环境中选中 seed_main.py 调试。
+运行 `python label_main.py`，或者在 PyCharm 等集成开发环境中选中 label_main.py 调试。
 在浏览器中打开本网站，进行登录或注册等操作，注册的第一个用户将是管理员。
 
 如果提示端口被占用，可以按如下结束端口上的进程：
 ```sh
-netstat -ano | findstr 8001
+netstat -ano | findstr 8011
 taskkill -F -PID PID号
 ```

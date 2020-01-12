@@ -45,3 +45,5 @@ target/
 # Project Files
 log/
 app.yml
+static/chars/
+static/json/

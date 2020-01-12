@@ -8,6 +8,7 @@
 import re
 import logging
 import traceback
+import hashlib
 from bson import json_util
 from bson.errors import BSONError
 from bson.objectid import ObjectId
@@ -18,8 +19,8 @@ from tornado.options import options
 from tornado.web import RequestHandler, MissingArgumentError
 from tornado_cors import CorsMixin
 from controller import errors as e
-from controller.com.access import prepare_access, can_access
-from utils.helper import get_date_time
+from controller.auth import get_route_roles, can_access
+from utils.helper import get_date_time, prop
 from utils.http_helper import call_api_async
 
 MongoError = (PyMongoError, BSONError)
@@ -59,7 +60,26 @@ class BaseHandler(CorsMixin, RequestHandler):
         except (MissingArgumentError, BSONError):
             pass
 
-        return prepare_access(self, self.request.path, self.request.method)
+        p, m = self.request.path, self.request.method
+        if options.testing and can_access('单元测试用户', p, m):
+            return
+        if can_access('访客', p, m):
+            return
+
+        login_url = self.get_login_url() + '?next=' + self.request.full_url() + '?info=1'
+        api = '/api/' in p
+        if not self.current_user:
+            return self.send_error_response(e.need_login) if api else self.redirect(login_url)
+        if can_access('普通用户', p, m):
+            return
+        if can_access(self.current_user['roles'], p, m):
+            return
+
+        need_roles = get_route_roles(p, m)
+        if not need_roles:
+            return self.send_error_response(e.url_not_config, render=not api)
+        message = '无权访问，需要申请%s%s角色' % ('、'.join(need_roles), '中某一种' if len(need_roles) > 1 else '')
+        return self.send_error_response(e.unauthorized, render=not api, message=message)
 
     def get_current_user(self):
         if 'Access-Control-Allow-Origin' not in self._headers:
@@ -80,7 +100,8 @@ class BaseHandler(CorsMixin, RequestHandler):
         kwargs['current_path'] = self.request.path
         kwargs['full_url'] = self.request.full_url()
         # can_access/dumps/to_date_str传递给页面模板
-        kwargs['can_access'] = lambda req_path, method='GET': can_access(self, req_path, method)
+        kwargs['can_access'] = lambda req_path, method='GET': can_access(
+            '访客' if not self.current_user else self.current_user.get('roles') or '普通用户', req_path, method)
         kwargs['dumps'] = json_util.dumps
         kwargs['to_date_str'] = lambda t, fmt='%Y-%m-%d %H:%M': get_date_time(fmt=fmt, date_time=t) if t else ''
         if self._finished:  # check_auth 等处报错返回后就不再渲染
@@ -220,6 +241,18 @@ class BaseHandler(CorsMixin, RequestHandler):
             ))
         except MongoError:
             pass
+
+    def get_img(self, page_code, resize=False):
+        host = prop(self.config, 'img.host')
+        salt = prop(self.config, 'img.salt')
+        if host and salt not in [None, '', '待配置'] and page_code:
+            md5 = hashlib.md5()
+            md5.update((page_code + salt).encode('utf-8'))
+            hash_value = md5.hexdigest()
+            inner_path = '/'.join(page_code.split('_')[:-1])
+            url = '%s/pages/%s/%s_%s.jpg' % (host, inner_path, page_code, hash_value)
+            url = url + '?x-oss-process=image/resize,m_lfit,h_300,w_300' if resize else url
+            return url
 
     def call_back_api(self, url, handle_response, handle_error=None, **kwargs):
         self._auto_finish = False

@@ -6,7 +6,7 @@ import controller.app as meta
 
 site = meta.Application([]).config['site']
 setup(
-    name='tornado-mongo-seed',
+    name='ocr-label',
     version=meta.__version__,
     description=site['name'],
     keywords=site['keywords'],
@@ -14,7 +14,7 @@ setup(
     packages=find_packages() + ['controller'],
     package_data={
         'controller': [
-            '../seed_main.py',
+            '../label_main.py',
             '../*.yml', '../requirements.txt', '../run_tests.py', '../tox.ini'
         ]
     },

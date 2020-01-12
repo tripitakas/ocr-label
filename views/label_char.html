@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% include _base_meta.html %}
+  {% include _base_css.html %}
+  <title>单字校对-{{txt}}</title>
+  <style>
+    .grid-item {
+      margin: 2px;
+      border: 2px solid transparent;
+      text-align: center;
+    }
+    .grid-item:hover {
+      border: 2px solid #ddd;
+      color: #00f;
+      font-weight: 700;
+    }
+    .grid-item:hover > img {
+      cursor: pointer;
+    }
+
+    .panel-heading {
+      margin-right: 0;
+    }
+    .breadcrumb {
+      margin-bottom: 0;
+    }
+
+    .modal-body .row + .row {
+      margin-top: 4px;
+    }
+    .img-wrapper {
+      height: 350px;
+      overflow: auto;
+    }
+  </style>
+</head>
+
+<body>
+<div class="app-main">
+  <div class="main">
+
+    <div class="panel panel-default">
+      <div class="panel-heading row">
+        <div class="col-sm-9">
+          <ol class="breadcrumb">
+            <li><a href="/">{{site['name']}}</a></li>
+            <li><a href="/char">单字校对</a></li>
+            <li class="active">{{txt}}</li>
+            <button class="btn btn-default waves-effect" style="margin-left: 15px" id="check-all">全部已校</button>
+          </ol>
+        </div>
+
+        <div class="col-sm-3">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="输入单字" id="search-box">
+            <span class="input-group-btn">
+              <button class="btn btn-default waves-effect" type="button" id="search">进入</button>
+              <a href="/api/user/login?next={{full_url}}" class="btn btn-default waves-effect" title="登录到大藏经数字化平台">
+                {% if currentUserId %}{{current_user['name']}}{% else %}登录{% end %}
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="grid">
+          {% for i, c in enumerate(chars) %}
+          <div class="grid-item" id="{{c['_id']}}">
+            <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{static_url('chars/%s/%s%03d.jpg' % (c['page'], txt, c['cid']))}}">
+            <p title="{{i + 1}}. {{c['page']}} #{{c['cid']}}">{{c['cc']}} {{c['page'][:2]}}</p>
+          </div>
+          {% end %}
+        </div>
+      </div>
+
+    </div>
+    {% module Pager(pager) %}
+
+  </div>
+</div>
+
+<div id="labelModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="labelModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">单字标注</h4>
+      </div>
+      <div class="modal-body" style="min-height: 450px">
+        <div class="row">
+          <h4 class="col-sm-2 control-label">单字</h4>
+          <div class="col-sm-3">
+            <input type="text" class="form-control txt" value="" placeholder="请输入单字">
+          </div>
+          <div class="col-sm-7">
+            <input type="text" class="form-control old_txt" readonly>
+          </div>
+        </div>
+        <div class="row">
+          <h4 class="col-sm-2 control-label">页面</h4>
+          <div class="col-sm-10">
+            <input type="text" class="form-control page" readonly>
+          </div>
+        </div>
+        <div class="row">
+          <div class="img-wrapper"><div id="label-holder"></div></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-info waves-effect waves-light doubt">存疑</button>
+        <button type="button" class="btn btn-info waves-effect waves-light invalid">错误</button>
+        <button type="button" class="btn btn-primary waves-effect waves-light confirm">修正</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include _base_js.html %}
+<script src="{{ static_url('assets/gallery/isotope.js') }}"></script>
+<script src="{{ static_url('js/cut/raphael.js') }}"></script>
+<script src="{{ static_url('js/cut/raphael.zoom.js') }}"></script>
+<script src="{{ static_url('js/cut/cut.js') }}"></script>
+
+<script>
+  $('.grid').isotope({
+    layoutMode: 'fitRows',
+    itemSelector: '.grid-item',
+    percentPosition: true
+  });
+
+  $('#search').click(function() {
+    var txt = $('#search-box').val();
+    if (txt[0]) {
+      window.location = '/char/' + txt[0];
+    } else {
+      showError('请输入单字');
+    }
+  });
+  $('#search-box').keydown(function(e) {
+    if (e.keyCode === 13) {
+      $('#search').click();
+    }
+  });
+
+  var $modal = $('#labelModal');
+  var cid;
+
+  $('.grid-item > img').click(function() {
+    var $wrapper = $modal.find('.img-wrapper');
+    $.cut.destroy();
+    cid = $(this).parent().attr('id');
+    getApi('/label/char/' + cid, function(r) {
+      $modal.find('.txt').val('');
+      $modal.find('.old_txt').val('原字: ' + r.old_txt + ', 置信度: ' + r.cc);
+      $modal.find('.page').val(r.page + ', 字框' + r.cid + ', 坐标[' + r.x + ',' + r.y + ',' + r.w + ',' + r.h + ']');
+      if (r.img_url) {
+        $.cut.create({
+          width: r.width, height: r.height,
+          image: r.img_url,
+          holder: 'label-holder',
+          scrollContainer: '.img-wrapper',
+          readonly: true,
+          chars: [{x: r.x, y: r.y, w: r.w, h: r.h}]
+        });
+      }
+      $modal.modal();
+    });
+  });
+
+  function save(data) {
+    postApi('/label/char/' + cid, data, function(r) {
+      $modal.find('[data-dismiss="modal"]').click();
+    });
+  }
+
+  $modal.find('.doubt').click(function() {
+    save({doubt: true});
+  });
+  $modal.find('.invalid').click(function() {
+    save({invalid: true});
+  });
+  $modal.find('.confirm').click(function() {
+    var txt = $modal.find('.txt').val();
+    if (!txt) {
+      showError('请输入单字');
+    } else {
+      save({txt: txt});
+    }
+  });
+</script>
+</body>
+</html>

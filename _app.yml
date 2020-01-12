@@ -1,20 +1,30 @@
 # 用于 set_secure_cookie 的秘钥, 生成方法: https://www.v2ex.com/t/12646
-cookie_secret: 'VZnbpP4kR0GqNgbMuuu6dkUfVrwqQkeWtBMJ3flp3HQ='
+cookie_secret: 'rQqTS0oOQIGbEJ5PghnwXQnjS5XPfkr0tpe+sBNDsVc='
 
 # 网站
 site:
-  name: 网站名称
-  keywords: key1,key2
-  description: 网站描述
-  domain: my-site.net
+  name: OCR标注平台
+  keywords: 大藏经,OCR,tripitaka,label
+  description: 如是我闻OCR标注和训练平台
+  domain: ocr-label.tripitakas.net
 
 # MongoDB
 database:
   host: localhost
   port: 27017
-  name: demo
+  name: ocr_label
   user:
   password:
 
 # 单点登录地址
 sso: 'http://localhost:8000/user/login'
+
+# OSS
+img:
+  host: 'https://tripitaka-img.oss-cn-beijing.aliyuncs.com'
+  salt:
+
+# 分页
+pager:
+  page_size: 20
+  display_count: 5

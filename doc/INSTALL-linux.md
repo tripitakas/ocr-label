@@ -42,7 +42,7 @@ mongod -logpath log/mongo.log -logappend -fork
 
 ### 4. 启动网站服务
 
-注：如果是在个人电脑上开发和测试，则不需要配置下面的参数，直接运行 `python3 seed_main.py` 即可。
+注：如果是在个人电脑上开发和测试，则不需要配置下面的参数，直接运行 `python3 label_main.py` 即可。
 
 - 如果要部署的云服务器有HTTPS证书和私钥文件（例如腾讯云是在下载的证书包的 Nginx 目录下），可以复制到本项目的目录下，
   在 `app.yml` 的 `https` 中指定这两个文件。

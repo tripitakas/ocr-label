@@ -1,16 +1,6 @@
-# tornado-mongo-seed
+# ocr-label
 
-基于 Python3 + Tornado + MongoDB 的Web后端项目模板。
-
-
-[![Build Status](https://travis-ci.org/tripitakas/tornado-mongo-seed.svg?branch=master)](https://travis-ci.org/tripitakas/tornado-mongo-seed)
-[![Coverage](https://codecov.io/gh/tripitakas/tornado-mongo-seed/branch/master/graph/badge.svg)](https://codecov.io/gh/tripitakas/tornado-mongo-seed)
-
-可以基于此项目替换：
-- tornado-mongo-seed 项目名
-- 默认端口号 8001
-- seed_main.py 文件名
-- _app.yml 中的数据库名和网站名
+如是我闻OCR标注和训练平台，基于 Python3 + Tornado + MongoDB 的Web项目。
 
 ## 安装
 
@@ -20,12 +10,16 @@
 - [INSTALL-mac.md](doc/INSTALL-mac.md)
 - [INSTALL-win.md](doc/INSTALL-win.md)
 
+```
+python3 utils/add_pages.py --json_path=<json_path>
+```
 ## 测试
 
 本项目可采用测试驱动开发(TDD)模式实现后端接口：
 
 ```
 pip3 install -r tests/requirements.txt
+python3 utils/add_pages.py --db_name=ocr_label_test --json_path=<json_path>
 python3 run_tests.py 或选中测试用例文件调试
 ```
 
