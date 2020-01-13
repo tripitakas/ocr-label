@@ -59,7 +59,6 @@ role_route_maps = {
     },
     '系统管理员': {
         'is_assignable': True,
-        'roles': ['OCR校对员'],
         'routes': {
             '/api': ['GET'],
         }

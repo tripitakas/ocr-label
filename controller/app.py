@@ -15,7 +15,7 @@ from controller.auth import url_placeholder
 from utils.helper import load_config, connect_db, BASE_DIR
 
 
-__version__ = '0.0.83.91223'
+__version__ = '0.0.1.200113'
 
 define('testing', default=False, help='the testing mode', type=bool)
 define('debug', default=True, help='the debug mode', type=bool)

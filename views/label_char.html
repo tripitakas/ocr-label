@@ -15,8 +15,41 @@
       color: #00f;
       font-weight: 700;
     }
+    .grid-item > img {
+      opacity: .4;
+      border: 1px solid transparent;
+    }
     .grid-item:hover > img {
       cursor: pointer;
+      opacity: 1;
+    }
+    .grid-item[data-result=""] > img {
+      opacity: 1;
+      border: 1px solid #ddd;
+    }
+    .grid-item > .result_icon {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      color: rgba(0, 255, 0, .8);
+    }
+    .grid-item:hover > .result_icon {
+      color: rgba(0, 255, 0, 1);
+    }
+    .result_icon > i {
+      display: none;
+    }
+    .grid-item[data-result="same"] .status-same {
+      display: inline;
+    }
+    .grid-item[data-result="doubt"] .status-doubt {
+      display: inline;
+    }
+    .grid-item[data-result="invalid"] .status-invalid {
+      display: inline;
+    }
+    .grid-item[data-result="changed"] .status-changed {
+      display: inline;
     }
 
     .panel-heading {
@@ -47,7 +80,8 @@
             <li><a href="/">{{site['name']}}</a></li>
             <li><a href="/char">单字校对</a></li>
             <li class="active">{{txt}}</li>
-            <button class="btn btn-default waves-effect" style="margin-left: 15px" id="check-all">全部已校</button>
+            <button class="btn btn-default waves-effect" style="margin-left: 15px" id="pass-all">本页已校</button>
+            <span>{{todo_count}} 个未校</span>
           </ol>
         </div>
 
@@ -66,8 +100,13 @@
       <div class="panel-body">
         <div class="grid">
           {% for i, c in enumerate(chars) %}
-          <div class="grid-item" id="{{c['_id']}}">
-            <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{static_url('chars/%s/%s%03d.jpg' % (c['page'], txt, c['cid']))}}">
+          <div class="grid-item" id="{{c['_id']}}" data-result="{{c.get('result', '')}}">
+            <div class="result_icon">
+              {% for k, v in status_icons.items() %}
+              <i class="glyphicon glyphicon-{{v[0]}} status-{{k}}" title="{{v[1]}}"></i>
+              {% end %}
+            </div>
+            <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{static_url('chars/%s/%s%03d.jpg' % (c['page'], c['old_txt'], c['cid']))}}">
             <p title="{{i + 1}}. {{c['page']}} #{{c['cid']}}">{{c['cc']}} {{c['page'][:2]}}</p>
           </div>
           {% end %}
@@ -145,20 +184,19 @@
   });
 
   var $modal = $('#labelModal');
-  var cid;
+  var curCharId;
 
   $('.grid-item > img').click(function() {
-    var $wrapper = $modal.find('.img-wrapper');
     $.cut.destroy();
-    cid = $(this).parent().attr('id');
-    getApi('/label/char/' + cid, function(r) {
-      $modal.find('.txt').val('');
+    curCharId = $(this).parent().attr('id');
+    getApi('/label/char/' + curCharId, function(r) {
+      $modal.find('.txt').val(r.old_txt === r.txt ? '' : r.txt);
       $modal.find('.old_txt').val('原字: ' + r.old_txt + ', 置信度: ' + r.cc);
       $modal.find('.page').val(r.page + ', 字框' + r.cid + ', 坐标[' + r.x + ',' + r.y + ',' + r.w + ',' + r.h + ']');
-      if (r.img_url) {
+      if (r.img) {
         $.cut.create({
           width: r.width, height: r.height,
-          image: r.img_url,
+          image: r.img,
           holder: 'label-holder',
           scrollContainer: '.img-wrapper',
           readonly: true,
@@ -169,25 +207,49 @@
     });
   });
 
-  function save(data) {
-    postApi('/label/char/' + cid, data, function(r) {
+  function updateStatus(cid, status) {
+    $('.grid-item#' + cid).attr('data-result', status);
+  }
+
+  function save(data, success) {
+    postApi('/label/char/' + curCharId, {data: data}, success || function(r) {
       $modal.find('[data-dismiss="modal"]').click();
+      updateStatus(curCharId, r.result);
     });
   }
 
   $modal.find('.doubt').click(function() {
-    save({doubt: true});
+    save({result: 'doubt'});
   });
   $modal.find('.invalid').click(function() {
-    save({invalid: true});
+    save({result: 'invalid'});
   });
   $modal.find('.confirm').click(function() {
     var txt = $modal.find('.txt').val();
     if (!txt) {
       showError('请输入单字');
     } else {
-      save({txt: txt});
+      save({txt: txt, result: 'changed'});
     }
+  });
+  $('#pass-all').click(function() {
+    var ids = $('.grid-item').map(function() {
+      return $(this).attr('id');
+    }).toArray();
+    curCharId = ids[0];
+    save({ids: ids}, function(res) {
+      res.result.forEach(function(status, i) {
+        updateStatus(ids[i], status);
+      });
+      setTimeout(function() {
+        var $next = $('.pagers .next-page');
+        if ($next.length) {
+          $next[0].click();
+        } else {
+          showSuccess('已到末页', '您可切换到其他字校对。');
+        }
+      }, 300);
+    });
   });
 </script>
 </body>

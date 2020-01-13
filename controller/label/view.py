@@ -35,12 +35,16 @@ class LabelCharHandler(BaseHandler):
 
     def get(self, txt):
         """ 单字校对页面 """
+        icons = dict(same=('ok', '已校为字与图一致'), doubt=('question-sign', '已校为字与图存疑、或难以辨认'),
+                     invalid=('exclamation-sign', '已校为无效样本，或字框切分错误'), changed=('edit', '校正后字与图一致'))
         try:
             if txt not in char2indice:
                 return self.send_error_response(e.no_object, message='没有此字(%s)' % txt)
 
             pager, chars = build_pager(self, self.db.char.find(dict(txt=txt)).sort('cc', 1),
                                        self.db.char.count_documents(dict(txt=txt)), 100)
-            self.render('label_char.html', txt=txt, pager=pager, chars=chars, img_size=img_size)
+            todo_count = self.db.char.count_documents(dict(txt=txt, result=None))
+            self.render('label_char.html', txt=txt, pager=pager, chars=chars, img_size=img_size,
+                        todo_count=todo_count, status_icons=icons)
         except DbError as err:
             self.send_db_error(err)

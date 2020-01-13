@@ -32,7 +32,7 @@ def update_char_sum(db, char_map, reset):
         print('%d chars updated%s' % (len(updated), ': ' + ''.join(updated) if updated else ''))
 
 
-def add_pages(json_path, db=None, db_name='ocr_label', uri='localhost', names=None, reset=False):
+def add_pages(json_path='', db=None, db_name='ocr_label', uri='localhost', names=None, reset=False):
     def scan_char(c):
         char_map[c['txt']] = char_map.get(c['txt'], c)
         if char_map[c['txt']]['cc'] < c['cc']:
