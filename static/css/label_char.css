@@ -34,6 +34,7 @@
 
 .grid-item:hover > .result_icon {
   color: rgba(0, 255, 0, 1);
+  font-size: .8em;
 }
 
 .result_icon > i {
@@ -54,6 +55,12 @@
 
 .grid-item[data-result="changed"] .status-changed {
   display: inline;
+}
+
+.grid-item.review .status-review {
+  display: inline;
+  font-size: .6em;
+  color: rgba(0, 0, 255, .7);
 }
 
 .panel-heading {

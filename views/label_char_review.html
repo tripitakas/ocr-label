@@ -50,11 +50,12 @@
       <div class="panel-body">
         <div class="grid">
           {% for i, c in enumerate(chars) %}
-          <div class="grid-item" id="{{c['_id']}}" data-result="{{c.get('result', '')}}">
+          <div class="grid-item {{'review' if c.get('review_by') else ''}}" id="{{c['_id']}}" data-result="{{c.get('result', '')}}">
             <div class="result_icon">
               {% for k, v in status_icons.items() %}
               <i class="glyphicon glyphicon-{{v[0]}} status-{{k}}" title="{{v[1]}}"></i>
               {% end %}
+              <i class="glyphicon glyphicon-lock status-review" title="已审定"></i>
             </div>
             <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{static_url('chars/%s/%s%03d.jpg' % (c['page'], c['old_txt'], c['cid']))}}">
             <p title="{{i + 1}}. {{c['page']}} #{{c['cid']}}">{{c['cc']}} {{c['txt']}}</p>

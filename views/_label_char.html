@@ -89,6 +89,9 @@
 
   function updateStatus(cid, status) {
     $('.grid-item#' + cid).attr('data-result', status);
+    if (saveUrl.indexOf('review') > 0) {
+      $('.grid-item#' + cid).addClass('review');
+    }
   }
 
   function save(data, success) {
