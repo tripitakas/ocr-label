@@ -3,8 +3,13 @@
 <head>
   {% include _base_meta.html %}
   {% include _base_css.html %}
-  <title>单字校对-{{txt}}</title>
+  <title>单字审核-{{txt}}</title>
   <link href="{{static_url('css/label_char.css')}}" rel="stylesheet"/>
+  <style>
+    .grid-item > img {
+      opacity: .7;
+    }
+  </style>
 </head>
 
 <body>
@@ -16,10 +21,17 @@
         <div class="col-sm-9">
           <ol class="breadcrumb">
             <li><a href="/">{{site['name']}}</a></li>
-            <li><a href="/char/proof">单字校对</a></li>
+            <li><a href="/char/review">单字审核</a></li>
             <li class="active">{{txt}}</li>
-            <button class="btn btn-default waves-effect" style="margin-left: 15px" id="pass-all">本页已校</button>
-            <span>{{todo_count}} 个未校</span>
+
+            <div class="btn-group result-filter" role="group" style="margin-left: 15px">
+              {% for s, t in [('same', '一致'), ('changed', '已改'), ('doubt', '存疑'), ('invalid', '无效')] %}
+              <a href="/char/review/{{txt}}?r={{s}}" type="button"
+                 class="btn btn-default waves-effect {{'active' if s==r_type else ''}}">{{t}}</a>
+              {% end %}
+            </div>
+            <button class="btn btn-default waves-effect" id="pass-all">本页已审</button>
+            <span>{{todo_count}} 个未审</span>
           </ol>
         </div>
 
@@ -45,7 +57,7 @@
               {% end %}
             </div>
             <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{static_url('chars/%s/%s%03d.jpg' % (c['page'], c['old_txt'], c['cid']))}}">
-            <p title="{{i + 1}}. {{c['page']}} #{{c['cid']}}">{{c['cc']}} {{c['page'][:2]}}</p>
+            <p title="{{i + 1}}. {{c['page']}} #{{c['cid']}}">{{c['cc']}} {{c['txt']}}</p>
           </div>
           {% end %}
         </div>
@@ -58,6 +70,9 @@
 </div>
 
 {% include _label_char.html %}
+<script>
+  saveUrl = '/label/char/review/';
+</script>
 
 </body>
 </html>

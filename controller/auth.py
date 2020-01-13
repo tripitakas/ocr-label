@@ -40,8 +40,8 @@ role_route_maps = {
         'is_assignable': False,
         'remark': '登录用户均可访问，无需授权',
         'routes': {
-            '/char': ['GET'],
-            '/char/@char': ['GET'],
+            '/char/proof': ['GET'],
+            '/char/proof/@char': ['GET'],
         }
     },
     'OCR校对员': {
@@ -55,6 +55,9 @@ role_route_maps = {
         'is_assignable': True,
         'roles': ['OCR校对员'],
         'routes': {
+            '/char/review': ['GET'],
+            '/char/review/@char': ['GET'],
+            '/api/label/char/review/@doc_id': ['GET', 'POST'],
         }
     },
     '系统管理员': {

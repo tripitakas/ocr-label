@@ -16,7 +16,8 @@ def update_char_sum(db, char_map, reset):
         {'$sort': {'count': -1}}
     ])
     if reset:
-        r = db.char_sum.insert_many(dict(txt=r['_id'], count=r['count'], char=char_map[r['_id']]) for r in chars)
+        r = db.char_sum.insert_many(dict(txt=r['_id'], count=r['count'], char=char_map[r['_id']], labeled=0)
+                                    for r in chars)
         print('%d chars added' % len(r.inserted_ids))
     else:
         updated = []

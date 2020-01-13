@@ -1,0 +1,139 @@
+<div id="label-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="label-modal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">单字标注</h4>
+      </div>
+      <div class="modal-body" style="min-height: 450px">
+        <div class="row">
+          <h4 class="col-sm-2 control-label">单字</h4>
+          <div class="col-sm-3">
+            <input type="text" class="form-control txt" value="" placeholder="请输入单字">
+          </div>
+          <div class="col-sm-7">
+            <input type="text" class="form-control old_txt" readonly>
+          </div>
+        </div>
+        <div class="row">
+          <h4 class="col-sm-2 control-label">页面</h4>
+          <div class="col-sm-10">
+            <input type="text" class="form-control page" readonly>
+          </div>
+        </div>
+        <div class="row">
+          <div class="img-wrapper"><div id="label-holder"></div></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-info waves-effect waves-light doubt">存疑</button>
+        <button type="button" class="btn btn-info waves-effect waves-light invalid">错误</button>
+        <button type="button" class="btn btn-primary waves-effect waves-light confirm">修正</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include _base_js.html %}
+<script src="{{ static_url('assets/gallery/isotope.js') }}"></script>
+<script src="{{ static_url('js/cut/raphael.js') }}"></script>
+<script src="{{ static_url('js/cut/raphael.zoom.js') }}"></script>
+<script src="{{ static_url('js/cut/cut.js') }}"></script>
+
+<script>
+  var $grid = $('.grid').isotope({
+    layoutMode: 'fitRows',
+    itemSelector: '.grid-item',
+    percentPosition: true
+  });
+
+  $('#search').click(function() {
+    var txt = $('#search-box').val();
+    if (txt[0]) {
+      window.location = '/char/' + txt[0];
+    } else {
+      showError('请输入单字');
+    }
+  });
+  $('#search-box').keydown(function(e) {
+    if (e.keyCode === 13) {
+      $('#search').click();
+    }
+  });
+
+  var $modal = $('#label-modal');
+  var curCharId, saveUrl = '/label/char/';
+
+  // 点击单字图显示标注对话框
+  $('.grid-item > img').click(function() {
+    $.cut.destroy();
+    curCharId = $(this).parent().attr('id');
+    getApi(saveUrl + curCharId, function(r) {
+      $modal.find('.txt').val(r.old_txt === r.txt ? '' : r.txt);
+      $modal.find('.old_txt').val('原字: ' + r.old_txt + ', 置信度: ' + r.cc);
+      $modal.find('.page').val(r.page + ', 字框' + r.cid + ', 坐标[' + r.x + ',' + r.y + ',' + r.w + ',' + r.h + ']');
+      if (r.img) {
+        $.cut.create({
+          width: r.width, height: r.height,
+          image: r.img,
+          holder: 'label-holder',
+          scrollContainer: '.img-wrapper',
+          readonly: true,
+          chars: [{x: r.x, y: r.y, w: r.w, h: r.h}]
+        });
+      }
+      $modal.modal();
+    });
+  });
+
+  function updateStatus(cid, status) {
+    $('.grid-item#' + cid).attr('data-result', status);
+  }
+
+  function save(data, success) {
+    postApi(saveUrl + curCharId, {data: data}, success || function(r) {
+      $modal.find('[data-dismiss="modal"]').click();
+      updateStatus(curCharId, r.result);
+    });
+  }
+
+  // “存疑”按钮
+  $modal.find('.doubt').click(function() {
+    save({result: 'doubt'});
+  });
+  // “错误”按钮
+  $modal.find('.invalid').click(function() {
+    save({result: 'invalid'});
+  });
+  // “修正”按钮
+  $modal.find('.confirm').click(function() {
+    var txt = $modal.find('.txt').val();
+    if (!txt) {
+      showError('请输入单字');
+    } else {
+      save({txt: txt, result: 'changed'});
+    }
+  });
+
+  // 本页已校
+  $('#pass-all').click(function() {
+    var ids = $('.grid-item').map(function() {
+      return $(this).attr('id');
+    }).toArray();
+    curCharId = ids[0];
+    save({ids: ids}, function(res) {
+      res.result.forEach(function(status, i) {
+        updateStatus(ids[i], status);
+      });
+      setTimeout(function() {
+        var $next = $('.pagers .next-page');
+        if ($next.length) {
+          $next[0].click();
+        } else {
+          showSuccess('已到末页', '您可切换到其他字校对。');
+        }
+      }, 300);
+    });
+  });
+</script>

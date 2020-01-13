@@ -1,0 +1,74 @@
+.grid-item {
+  margin: 2px;
+  border: 2px solid transparent;
+  text-align: center;
+}
+
+.grid-item:hover {
+  border: 2px solid #ddd;
+  color: #00f;
+  font-weight: 700;
+}
+
+.grid-item > img {
+  opacity: .4;
+  border: 1px solid transparent;
+}
+
+.grid-item:hover > img {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.grid-item[data-result=""] > img {
+  opacity: 1;
+  border: 1px solid #ddd;
+}
+
+.grid-item > .result_icon {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  color: rgba(0, 255, 0, .8);
+}
+
+.grid-item:hover > .result_icon {
+  color: rgba(0, 255, 0, 1);
+}
+
+.result_icon > i {
+  display: none;
+}
+
+.grid-item[data-result="same"] .status-same {
+  display: inline;
+}
+
+.grid-item[data-result="doubt"] .status-doubt {
+  display: inline;
+}
+
+.grid-item[data-result="invalid"] .status-invalid {
+  display: inline;
+}
+
+.grid-item[data-result="changed"] .status-changed {
+  display: inline;
+}
+
+.panel-heading {
+  margin-right: 0;
+}
+
+.breadcrumb {
+  margin-bottom: 0;
+}
+
+.modal-body .row + .row {
+  margin-top: 4px;
+}
+
+.img-wrapper {
+  height: 350px;
+  overflow: auto;
+}

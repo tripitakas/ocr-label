@@ -3,7 +3,7 @@
 <head>
   {% include _base_meta.html %}
   {% include _base_css.html %}
-  <title>单字校对</title>
+  <title>单字审核</title>
   <style>
     .grid-item {
       margin: 2px;
@@ -37,7 +37,7 @@
         <div class="col-sm-9">
           <ol class="breadcrumb">
             <li><a href="/">{{site['name']}}</a></li>
-            <li class="active">单字校对</li>
+            <li class="active">单字审核</li>
           </ol>
         </div>
 
@@ -58,9 +58,13 @@
           {% for i, c in enumerate(chars) %}
           <div class="grid-item" data-char="{{c['txt']}}">
             <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{static_url('chars/%s/%s%03d.jpg' % (c['char']['page'], c['txt'], c['char']['cid']))}}">
-            <p title="{{i + 1}}. {{c['txt']}} {{c['count']}}个样本">{{c['txt']}} {{c['count']}}</p>
+            <p title="{{i + 1}}. {{c['txt']}} 已校{{c.get('labeled', 0)}}个，共{{c['count']}}个">{{c['txt']}} {{c.get('labeled', 0)}}</p>
           </div>
           {% end %}
+          <div class="grid-item" data-char="-">
+            <img width="{{img_size[0]}}" height="{{img_size[1]}}">
+            <p>全部已校</p>
+          </div>
         </div>
       </div>
 
@@ -83,7 +87,7 @@
   $('#search').click(function() {
     var txt = $('#search-box').val();
     if (txt[0]) {
-      window.location = '/char/proof/' + txt[0];
+      window.location = '/char/review/' + txt[0];
     } else {
       showError('请输入单字');
     }
@@ -95,7 +99,7 @@
   });
 
   $('.grid-item > img').click(function() {
-    window.location = '/char/proof/' + $(this).parent().attr('data-char');
+    window.location = '/char/review/' + $(this).parent().attr('data-char');
   });
 </script>
 </body>

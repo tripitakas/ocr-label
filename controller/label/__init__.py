@@ -4,7 +4,7 @@
 from . import view, api
 
 views = [
-    view.LabelCharsHandler, view.LabelCharHandler,
+    view.LabelCharsHandler, view.LabelCharHandler, view.ReviewCharsHandler, view.ReviewCharHandler,
 ]
 handlers = [
     api.LabelCharApi,
