@@ -95,6 +95,8 @@
   }
 
   function save(data, success) {
+    if (!curCharId)
+      return
     postApi(saveUrl + curCharId, {data: data}, success || function(r) {
       $modal.find('[data-dismiss="modal"]').click();
       updateStatus(curCharId, r.result);

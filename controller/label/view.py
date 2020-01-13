@@ -43,11 +43,18 @@ class LabelCharHandler(BaseHandler):
             if txt not in char2indice:
                 return self.send_error_response(e.no_object, message='没有此字(%s)' % txt)
 
-            pager, chars = build_pager(self, self.db.char.find(dict(txt=txt)).sort('cc', 1),
-                                       self.db.char.count_documents(dict(txt=txt)), 100)
+            r_type = self.get_query_argument('r', '')
+            cond = dict(txt=txt)
+            if r_type == 'n':
+                cond['proof_by'] = None
+            elif r_type == 'y':
+                cond['proof_by'] = {'$ne': None}
+
+            pager, chars = build_pager(self, self.db.char.find(cond).sort('cc', 1),
+                                       self.db.char.count_documents(cond), 100)
             todo_count = self.db.char.count_documents(dict(txt=txt, result=None))
             self.render('label_char.html', txt=txt, pager=pager, chars=chars, img_size=img_size,
-                        todo_count=todo_count, status_icons=icons)
+                        todo_count=todo_count, status_icons=icons, r_type=r_type)
         except DbError as err:
             self.send_db_error(err)
 
