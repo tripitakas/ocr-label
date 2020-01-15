@@ -18,6 +18,11 @@
     .grid-item:hover > img {
       cursor: pointer;
     }
+    .has-labeled {
+      color: #00f;
+      font-weight: 700;
+      border: 2px solid rgba(0, 255, 0, .4);
+    }
 
     .panel-heading {
       margin-right: 0;
@@ -56,9 +61,10 @@
       <div class="panel-body">
         <div class="grid">
           {% for i, c in enumerate(chars) %}
-          <div class="grid-item" data-char="{{c['txt']}}">
+          <div class="grid-item {{'has-labeled' if c.get('labeled') else ''}} {{'finished' if c.get('labeled') == c['count'] else ''}}" data-char="{{c['txt']}}">
             <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{get_char_img(c['char'])}}">
-            <p title="{{i + 1}}. {{c['txt']}} {{c['count']}}个样本">{{c['txt']}} {{c['count']}}</p>
+            <p title="{{i + 1}}. {{c['txt']}}，{{c['count']}}个样本，已校{{c.get('labeled', 0)}}个样本">{{c['txt']}}
+              {{ '%d/%d' % (c['labeled'], c['count']) if c.get('labeled') else c['count'] }}</p>
           </div>
           {% end %}
         </div>

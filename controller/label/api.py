@@ -88,6 +88,7 @@ class LabelCharApi(BaseHandler):
 
             if 'review' in self.request.path:
                 self.db.char.update_one({'_id': char['_id']}, {'$set': by})
+                to_update.add(char['txt'])
             elif not char.get('result'):
                 r = self.db.char.update_one({'_id': char['_id']}, {'$set': dict(result='same')})
                 if r.modified_count:
@@ -102,6 +103,11 @@ class LabelCharApi(BaseHandler):
         self.send_data_response(dict(result=result))
 
     def update_labeled_count(self, txt):
-        cond = dict(txt=txt, result={'$ne': None})
-        labeled = self.db.char.count_documents(cond)
-        self.db.char_sum.update_one(dict(txt=txt), {'$set': dict(labeled=labeled)})
+        if 'review' in self.request.path:
+            cond = dict(txt=txt, review_by={'$ne': None})
+            review_count = self.db.char.count_documents(cond)
+            self.db.char_sum.update_one(dict(txt=txt), {'$set': dict(review_count=review_count)})
+        else:
+            cond = dict(txt=txt, result={'$ne': None})
+            labeled = self.db.char.count_documents(cond)
+            self.db.char_sum.update_one(dict(txt=txt), {'$set': dict(labeled=labeled)})

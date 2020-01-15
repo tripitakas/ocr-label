@@ -18,7 +18,14 @@
             <li><a href="/">{{site['name']}}</a></li>
             <li><a href="/char/proof">单字校对</a></li>
             <li class="active">{{txt}}</li>
-            <button class="btn btn-default waves-effect" style="margin-left: 15px" id="pass-all">本页已校</button>
+
+            <div class="btn-group result-filter" role="group" style="margin-left: 15px">
+              {% for s, t in [('y', '已校'), ('n', '未校'), ('', '全部')] %}
+              <a href="/char/proof/{{txt}}?r={{s}}" type="button"
+                 class="btn btn-default waves-effect {{'active' if s==r_type else ''}}">{{t}}</a>
+              {% end %}
+            </div>
+            <button class="btn btn-default waves-effect" id="pass-all">本页已校</button>
             <span>{{todo_count}} 个未校</span>
           </ol>
         </div>
