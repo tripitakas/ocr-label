@@ -45,7 +45,7 @@
               {% end %}
               <i class="glyphicon glyphicon-lock status-review" title="已审定"></i>
             </div>
-            <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{static_url('chars/%s/%s%03d.jpg' % (c['page'], c['old_txt'], c['cid']))}}">
+            <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{get_char_img(c)}}">
             <p title="{{i + 1}}. {{c['page']}} #{{c['cid']}}">{{c['cc']}} {{c['page'][:2]}}</p>
           </div>
           {% end %}

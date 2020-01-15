@@ -57,7 +57,7 @@
         <div class="grid">
           {% for i, c in enumerate(chars) %}
           <div class="grid-item" data-char="{{c['txt']}}">
-            <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{static_url('chars/%s/%s%03d.jpg' % (c['char']['page'], c['txt'], c['char']['cid']))}}">
+            <img width="{{img_size[0]}}" height="{{img_size[1]}}" src="{{get_char_img(c['char'])}}">
             <p title="{{i + 1}}. {{c['txt']}} {{c['count']}}个样本">{{c['txt']}} {{c['count']}}</p>
           </div>
           {% end %}

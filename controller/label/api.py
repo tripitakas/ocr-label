@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import re
 from bson.objectid import ObjectId
 from datetime import datetime
 from controller.base import BaseHandler, DbError
@@ -19,10 +20,13 @@ class LabelCharApi(BaseHandler):
             if char is None:
                 return self.send_error_response(e.no_object, message='没有此单字')
             page = self.db.page.find_one({'name': char['page']})
-            img = self.get_img(char['page'])
-            if page and img:
-                char['img'] = img
-                char.update(dict(img=img, width=page['width'], height=page['height']))
+            col_id = re.sub(r'c\d+$', '', char['old_id'])
+            img = self.static_url('ocr_img/col/%s/%s.jpg' % (char['page'], col_id))
+            col = [c for c in page['columns'] if c['column_id'] == col_id]
+            if page and img and col:
+                char['x'] -= col[0]['x']
+                char['y'] -= col[0]['y']
+                char.update(dict(img=img, width=col[0]['w'], height=col[0]['h']))
             self.send_data_response(char)
         except DbError as err:
             self.send_db_error(err)
@@ -66,6 +70,9 @@ class LabelCharApi(BaseHandler):
             self.send_data_response(char)
         except DbError as err:
             self.send_db_error(err)
+
+    def get_line_img(self, c):
+        return self.static_url('ocr_img/col/%s/b%dc%d.jpg' % (c['page'], c['block_no'], c['line_no']))
 
     def batch_pass(self, data):
         result = []
