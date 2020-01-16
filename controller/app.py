@@ -20,6 +20,7 @@ __version__ = '0.0.4.200116'
 define('testing', default=False, help='the testing mode', type=bool)
 define('debug', default=True, help='the debug mode', type=bool)
 define('port', default=8011, help='run port', type=int)
+define('data_path', default='', help='data root path', type=str)
 
 
 class Application(web.Application):

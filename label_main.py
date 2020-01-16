@@ -30,10 +30,11 @@ if __name__ == '__main__':
         server.add_sockets(sockets)
         protocol = 'https' if ssl_options else 'http'
         logging.info('Start the service #%d v%s on %s://localhost:%d' % (fork_id, app.version, protocol, opt.port))
-        if fork_id == 0 and app.db and app.db.page.count_documents({}) == 0:
-            script = 'python3 utils/add_pages.py --uri={0} --db_name={1}'.format(
-                app.db_uri, app.config['database']['name'])
+        if fork_id == 0 and app.db and app.db.page.count_documents({}) == 0 and os.path.exists(opt.data_path):
+            script = 'python3 utils/add_pages.py --uri={0} --db_name={1} --json_path={2}/json'.format(
+                app.db_uri, app.config['database']['name'], opt.data_path)
             os.system(script)
+            os.system('ln -s %s static/ocr_img' % opt.data_path)
         ioloop.IOLoop.current().start()
 
     except KeyboardInterrupt:
