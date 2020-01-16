@@ -45,11 +45,15 @@ class LabelCharHandler(LabelViewHandler):
     def get(self, txt):
         """ 单字校对页面 """
         try:
-            if txt not in char2indice:
-                return self.send_error_response(e.no_object, message='没有此字(%s)' % txt)
+            if txt in ['1', '2', '3', '4']:
+                texts = [c['txt'] for c in self.db.char_sum.find(dict(count=int(txt)))]
+                cond = dict(txt={'$in': texts})
+            else:
+                if txt not in char2indice:
+                    return self.send_error_response(e.no_object, message='没有此字(%s)' % txt)
+                cond = dict(txt=txt)
 
             r_type = self.get_query_argument('r', '')
-            cond = dict(txt=txt)
             if r_type == 'n':
                 cond['proof_by'] = None
             elif r_type == 'y':

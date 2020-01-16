@@ -67,6 +67,10 @@
               {{ '%d/%d' % (c['labeled'], c['count']) if c.get('labeled') else c['count'] }}</p>
           </div>
           {% end %}
+          <div class="grid-item" data-char="1">
+            <img width="{{img_size[0]}}" height="{{img_size[1]}}">
+            <p title="只有一个样本的字">单样本</p>
+          </div>
         </div>
       </div>
 
