@@ -38,7 +38,7 @@ def load_config():
         with open(cfg_file, 'w') as f:
             f.write('todo:')
     for k, v in config_base.items():
-        if k not in config or k in ['site']:
+        if k not in config:
             config[k] = v
 
     return config

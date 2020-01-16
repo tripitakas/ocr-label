@@ -36,7 +36,7 @@ class LabelCharsHandler(LabelViewHandler):
             self.render('label_chars.html', pager=pager, chars=chars, img_size=img_size,
                         get_char_img=self.get_char_img)
         except DbError as err:
-            self.send_db_error(err)
+            self.send_db_error(err, render=True)
 
 
 class LabelCharHandler(LabelViewHandler):
@@ -61,7 +61,7 @@ class LabelCharHandler(LabelViewHandler):
             self.render('label_char.html', txt=txt, pager=pager, chars=chars, img_size=img_size,
                         todo_count=todo_count, status_icons=icons, r_type=r_type, get_char_img=self.get_char_img)
         except DbError as err:
-            self.send_db_error(err)
+            self.send_db_error(err, render=True)
 
 
 class ReviewCharsHandler(LabelViewHandler):
@@ -76,7 +76,7 @@ class ReviewCharsHandler(LabelViewHandler):
             self.render('label_chars_review.html', pager=pager, chars=chars, img_size=img_size,
                         get_char_img=self.get_char_img)
         except DbError as err:
-            self.send_db_error(err)
+            self.send_db_error(err, render=True)
 
 
 class ReviewCharHandler(LabelViewHandler):
@@ -101,4 +101,4 @@ class ReviewCharHandler(LabelViewHandler):
             self.render('label_char_review.html', txt=txt, pager=pager, chars=chars, img_size=img_size,
                         todo_count=todo_count, status_icons=icons, r_type=r_type, get_char_img=self.get_char_img)
         except DbError as err:
-            self.send_db_error(err)
+            self.send_db_error(err, render=True)

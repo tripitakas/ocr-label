@@ -39,7 +39,8 @@ class BaseHandler(CorsMixin, RequestHandler):
         self.more = {}  # 给子类记录使用
 
     def set_default_headers(self):
-        self.set_header('Access-Control-Allow-Origin', '*' if options.debug else self.application.site['domain'])
+        self.set_header('Access-Control-Allow-Origin', '*' if options.debug else re.sub(
+            'http(s)?://|:[0-9]+$', '', self.application.site['domain']))
         self.set_header('Cache-Control', 'no-cache')
         self.set_header('Access-Control-Allow-Headers', self.CORS_HEADERS)
         self.set_header('Access-Control-Allow-Methods', self._get_methods())
@@ -98,7 +99,7 @@ class BaseHandler(CorsMixin, RequestHandler):
         kwargs['debug'] = self.application.settings['debug']
         kwargs['site'] = dict(self.application.site)
         kwargs['current_path'] = self.request.path
-        kwargs['full_url'] = self.request.full_url()
+        kwargs['full_url'] = self.application.site['domain'] + self.request.path
         # can_access/dumps/to_date_str传递给页面模板
         kwargs['can_access'] = lambda req_path, method='GET': can_access(
             '访客' if not self.current_user else self.current_user.get('roles') or '普通用户', req_path, method)
