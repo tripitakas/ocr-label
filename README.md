@@ -4,7 +4,7 @@
 
 ## 安装
 
-本平台需要 Python 3.6+、MongoDB，请参考下面的说明安装和部署。
+本平台需要 Python 3.6+、MongoDB（可本地不安装，用远程登录），请参考下面的说明安装和部署。
 
 - [INSTALL-linux.md](doc/INSTALL-linux.md)
 - [INSTALL-mac.md](doc/INSTALL-mac.md)

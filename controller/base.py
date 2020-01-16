@@ -67,7 +67,7 @@ class BaseHandler(CorsMixin, RequestHandler):
         if can_access('访客', p, m):
             return
 
-        login_url = self.get_login_url() + '?next=' + self.request.full_url() + '?info=1'
+        login_url = '%s?next=%s%s?info=1' % (self.get_login_url(), self.application.site['domain'], self.request.path)
         api = '/api/' in p
         if not self.current_user:
             return self.send_error_response(e.need_login) if api else self.redirect(login_url)
