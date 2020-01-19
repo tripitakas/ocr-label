@@ -47,7 +47,6 @@ class LabelCharApi(BaseHandler):
                 return self.send_error_response(e.no_object, message='没有此单字')
             if char.get('review_by') and 'review' not in self.request.path:
                 return self.send_error_response(e.unauthorized, message='已审核，不能再校对')
-            old_txt = char['txt']
 
             if data.get('txt'):
                 if data['txt'] not in char2indice:
@@ -63,9 +62,7 @@ class LabelCharApi(BaseHandler):
                 self.add_op_log('label_char', target_id=char['_id'],
                                 message='%s %s' % (data['result'], data.get('txt', '')))
                 char.update(data)
-                self.update_labeled_count(char['txt'])
-                if char['txt'] != old_txt:
-                    self.update_labeled_count(old_txt)
+                self.update_labeled_count(char['old_txt'])
 
             self.send_data_response(char)
         except DbError as err:
@@ -88,13 +85,13 @@ class LabelCharApi(BaseHandler):
 
             if 'review' in self.request.path:
                 self.db.char.update_one({'_id': char['_id']}, {'$set': by})
-                to_update.add(char['txt'])
+                to_update.add(char['old_txt'])
             elif not char.get('result'):
                 r = self.db.char.update_one({'_id': char['_id']}, {'$set': dict(result='same')})
                 if r.modified_count:
                     self.db.char.update_one({'_id': char['_id']}, {'$set': by})
                     char['result'] = 'same'
-                    to_update.add(char['txt'])
+                    to_update.add(char['old_txt'])
 
             result.append(char['result'])
 
@@ -104,10 +101,10 @@ class LabelCharApi(BaseHandler):
 
     def update_labeled_count(self, txt):
         if 'review' in self.request.path:
-            cond = dict(txt=txt, review_by={'$ne': None})
+            cond = dict(old_txt=txt, review_by={'$ne': None})
             review_count = self.db.char.count_documents(cond)
             self.db.char_sum.update_one(dict(txt=txt), {'$set': dict(review_count=review_count)})
         else:
-            cond = dict(txt=txt, result={'$ne': None})
+            cond = dict(old_txt=txt, result={'$ne': None})
             labeled = self.db.char.count_documents(cond)
             self.db.char_sum.update_one(dict(txt=txt), {'$set': dict(labeled=labeled)})

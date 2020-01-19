@@ -46,12 +46,12 @@ class LabelCharHandler(LabelViewHandler):
         """ 单字校对页面 """
         try:
             if txt in ['1', '2', '3', '4']:
-                texts = [c['txt'] for c in self.db.char_sum.find(dict(count=int(txt)))]
-                cond = dict(txt={'$in': texts})
+                texts = [c['old_txt'] for c in self.db.char_sum.find(dict(count=int(txt)))]
+                cond = dict(old_txt={'$in': texts})
             else:
                 if txt not in char2indice:
                     return self.send_error_response(e.no_object, message='没有此字(%s)' % txt)
-                cond = dict(txt=txt)
+                cond = dict(old_txt=txt)
 
             r_type = self.get_query_argument('r', '')
             if r_type == 'n':
@@ -61,7 +61,7 @@ class LabelCharHandler(LabelViewHandler):
 
             pager, chars = self.build_pager(self.db.char.find(cond).sort('cc', 1),
                                             self.db.char.count_documents(cond), 100)
-            todo_count = self.db.char.count_documents(dict(txt=txt, result=None))
+            todo_count = self.db.char.count_documents(dict(old_txt=txt, result=None))
             self.render('label_char.html', txt=txt, pager=pager, chars=chars, img_size=img_size,
                         todo_count=todo_count, status_icons=icons, r_type=r_type, get_char_img=self.get_char_img)
         except DbError as err:
@@ -93,11 +93,11 @@ class ReviewCharHandler(LabelViewHandler):
                 return self.send_error_response(e.no_object, message='没有此字(%s)' % txt)
 
             r_type = self.get_query_argument('r', '')
-            cond = dict(txt=txt, result={'$in': list(icons.keys())})
+            cond = dict(old_txt=txt, result={'$in': list(icons.keys())})
             if r_type:
                 cond['result'] = r_type
             if txt == '-':
-                cond.pop('txt')
+                cond.pop('old_txt')
             pager, chars = self.build_pager(self.db.char.find(cond).sort('cc', 1),
                                             self.db.char.count_documents(cond), 100)
             cond['review_by'] = None
