@@ -92,6 +92,8 @@ class LabelCharApi(BaseHandler):
                     self.db.char.update_one({'_id': char['_id']}, {'$set': by})
                     char['result'] = 'same'
                     to_update.add(char['old_txt'])
+            if not to_update:
+                to_update.add(char['old_txt'])
 
             result.append(char['result'])
 
