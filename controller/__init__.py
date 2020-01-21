@@ -9,6 +9,6 @@ views = com.views + label.views
 handlers = com.handlers + label.handlers
 handlers += [invalid.ApiTable]
 
-modules = com.modules
+modules = dict(com.modules, **label.modules)
 
 InvalidPageHandler = invalid.InvalidPageHandler

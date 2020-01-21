@@ -49,6 +49,7 @@ role_route_maps = {
         'roles': ['普通用户'],
         'routes': {
             '/api/label/char/@doc_id': ['GET', 'POST'],
+            '/char/box/@doc_id': ['GET'],
         }
     },
     'OCR审定员': {

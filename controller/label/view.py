@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from bson.objectid import ObjectId
 from controller.base import BaseHandler, DbError
 from utils.helper import char2indice
 import controller.errors as e
@@ -62,7 +63,7 @@ class LabelCharHandler(LabelViewHandler):
             pager, chars = self.build_pager(self.db.char.find(cond).sort('cc', 1),
                                             self.db.char.count_documents(cond), 100)
             todo_count = self.db.char.count_documents(dict(old_txt=txt, result=None))
-            self.render('label_char.html', txt=txt, pager=pager, chars=chars, img_size=img_size,
+            self.render('label_char.html', txt=txt, pager=pager, chars=chars,
                         todo_count=todo_count, status_icons=icons, r_type=r_type, get_char_img=self.get_char_img)
         except DbError as err:
             self.send_db_error(err, render=True)
@@ -102,7 +103,23 @@ class ReviewCharHandler(LabelViewHandler):
                                             self.db.char.count_documents(cond), 100)
             cond['review_by'] = None
             todo_count = self.db.char.count_documents(cond)
-            self.render('label_char_review.html', txt=txt, pager=pager, chars=chars, img_size=img_size,
+            self.render('label_char_review.html', txt=txt, pager=pager, chars=chars,
                         todo_count=todo_count, status_icons=icons, r_type=r_type, get_char_img=self.get_char_img)
+        except DbError as err:
+            self.send_db_error(err, render=True)
+
+
+class EditCharBoxHandler(LabelViewHandler):
+    URL = '/char/box/@doc_id'
+
+    def get(self, doc_id):
+        """ 修改字框的页面 """
+        try:
+            char = self.db.char.find_one({'_id': ObjectId(doc_id)})
+            if char is None:
+                return self.send_error_response(e.no_object, message='没有此单字', render=True)
+            page = self.db.page.find_one({'name': char['page']})
+
+            self.render('label_box.html', page=page, char=char, img=self.get_img(char['page']))
         except DbError as err:
             self.send_db_error(err, render=True)

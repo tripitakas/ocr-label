@@ -6,7 +6,7 @@ site:
   name: OCR标注平台
   keywords: 大藏经,OCR,tripitaka,label
   description: 如是我闻OCR标注和训练平台
-  domain: ocr-label.tripitakas.net
+  domain: http://localhost:8011
 
 # MongoDB
 database:
@@ -18,6 +18,9 @@ database:
 
 # 单点登录地址
 sso: 'http://localhost:8000/user/login'
+
+# 单字图和列图的映射路径
+data_path:
 
 # OSS
 img:

@@ -18,7 +18,12 @@
         <div class="row">
           <h4 class="col-sm-2 control-label">页面</h4>
           <div class="col-sm-10">
-            <input type="text" class="form-control page" readonly>
+            <div class="input-group">
+              <input type="text" class="form-control page" readonly>
+              <span class="input-group-btn">
+                <button class="btn btn-default waves-effect edit-box" type="button">改框</button>
+              </span>
+            </div>
           </div>
         </div>
         <div class="row">
@@ -46,20 +51,6 @@
     layoutMode: 'fitRows',
     itemSelector: '.grid-item',
     percentPosition: true
-  });
-
-  $('#search').click(function() {
-    var txt = $('#search-box').val();
-    if (txt[0]) {
-      window.location = '/char/' + txt[0];
-    } else {
-      showError('请输入单字');
-    }
-  });
-  $('#search-box').keydown(function(e) {
-    if (e.keyCode === 13) {
-      $('#search').click();
-    }
   });
 
   var $modal = $('#label-modal');
@@ -96,7 +87,7 @@
 
   function save(data, success) {
     if (!curCharId)
-      return
+      return;
     postApi(saveUrl + curCharId, {data: data}, success || function(r) {
       $modal.find('[data-dismiss="modal"]').click();
       updateStatus(curCharId, r.result);
@@ -140,5 +131,9 @@
         }
       }, 300);
     });
+  });
+
+  $modal.find('.edit-box').click(function () {
+    window.location = '/char/box/' + curCharId + '?next={{request.path}}';
   });
 </script>
