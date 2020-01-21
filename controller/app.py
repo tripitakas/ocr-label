@@ -15,12 +15,11 @@ from controller.auth import url_placeholder
 from utils.helper import load_config, connect_db, BASE_DIR
 
 
-__version__ = '0.0.5.200119'
+__version__ = '0.0.6.200119'
 
 define('testing', default=False, help='the testing mode', type=bool)
 define('debug', default=True, help='the debug mode', type=bool)
 define('port', default=8011, help='run port', type=int)
-define('data_path', default='', help='data root path', type=str)
 
 
 class Application(web.Application):
